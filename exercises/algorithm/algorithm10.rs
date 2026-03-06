@@ -2,7 +2,6 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -13,6 +12,8 @@ impl fmt::Display for NodeNotInGraph {
         write!(f, "accessing a node that is not in the graph")
     }
 }
+
+#[derive(Debug)]
 pub struct UndirectedGraph {
     adjacency_table: HashMap<String, Vec<(String, i32)>>,
 }
@@ -30,6 +31,23 @@ impl Graph for UndirectedGraph {
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
         //TODO
+        let (src, dest, weight) = edge;
+        match self.adjacency_table.get(&src.to_string()) {
+            None => self.add_node(src),
+            _ => true,
+        };
+
+        match self.adjacency_table.get(&dest.to_string()) {
+            None => self.add_node(dest),
+            _ => true,
+        };
+
+        if let Some(vec) = self.adjacency_table.get_mut(&src.to_string()) {
+            vec.push((dest.to_string(), weight));
+        }
+        if let Some(vec) = self.adjacency_table.get_mut(&dest.to_string()) {
+            vec.push((src.to_string(), weight));
+        }
     }
 }
 pub trait Graph {
@@ -38,6 +56,8 @@ pub trait Graph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
+        let adj = self.adjacency_table_mutable();
+        adj.insert(node.to_string(), Vec::new());
 		true
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
@@ -69,6 +89,7 @@ mod test_undirected_graph {
         graph.add_edge(("a", "b", 5));
         graph.add_edge(("b", "c", 10));
         graph.add_edge(("c", "a", 7));
+        println!("{:?}", graph);
         let expected_edges = [
             (&String::from("a"), &String::from("b"), 5),
             (&String::from("b"), &String::from("a"), 5),
